@@ -22,7 +22,6 @@ class Exercise:
     equipment: str
     instructions: str
 
-
 EXERCISES = [
     Exercise("Push-Up", "Chest", "Beginner", "No Equipment",
              "Start in a plank position. Lower your chest toward the floor and push back up."),
@@ -115,7 +114,7 @@ EXERCISES = [
              "Press a barbell overhead from shoulder height."),
     Exercise("Dumbbell Lateral Raise", "Shoulders", "Intermediate", "Dumbbells",
              "Raise dumbbells outward until your arms reach shoulder height."),
-    Exercise("Cable Face Pull", "Shoulders", "Intermediate", "Cables",
+    Exercise("Cable Rear Delt Face Pull", "Shoulders", "Intermediate", "Cables",
              "Pull a rope attachment toward your face."),
     Exercise("Reverse Pec Deck", "Shoulders", "Intermediate", "Machine",
              "Move your arms backward against the machine's resistance."),
@@ -428,7 +427,10 @@ def exercise_results(
     add_navigation(content)
     content.append("Here are your matching exercises:")
     if len(state.matching_exercises) == 0:
-        content.append("No exercises matched your search. ""Try changing your selections.")
+        content.append(
+            "No exercises matched your search."
+            "Try changing your selections."
+        )
     else:
         content.append(
             "Number of matching exercises: "
