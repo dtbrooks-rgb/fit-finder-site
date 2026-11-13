@@ -7,7 +7,7 @@ set_site_information(
     description= "FitFinder is a fitness website that helps users find exercises based on muscle group, available equipment, and difficulty level. Users can view exercise instructions and save their favorite exercises.",
     sources="Drafter documentation and AI assistance from ChatGPT.",
     planning=["design.pdf", "planning.pdf"],
-    links=["https://github.com/dtbrooks-rgb/FitFinder"]
+    links=["https://github.com/dtbrooks-rgb/fit-finder-site"]
 )
 set_website_title("FitFinder")
 hide_debug_information()
