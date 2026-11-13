@@ -1,10 +1,11 @@
+
 from bakery import assert_equal
 from dataclasses import dataclass
 from drafter import *
 
 set_site_information(
     author="dtbrooks@udel.edu",
-    description= "FitFinder is a fitness website that helps users find exercises based on muscle group, available equipment, and difficulty level. Users can view exercise instructions and save their favorite exercises.",
+    description="FitFinder is a fitness website that helps users find exercises based on muscle group, available equipment, and difficulty level. Users can view exercise instructions and save their favorite exercises.",
     sources="Drafter documentation and AI assistance from ChatGPT.",
     planning=["design.pdf", "planning.pdf"],
     links=["https://github.com/dtbrooks-rgb/fit-finder-site"]
@@ -12,6 +13,7 @@ set_site_information(
 set_website_title("FitFinder")
 hide_debug_information()
 set_website_framed(False)
+
 
 @dataclass
 class Exercise:
@@ -21,6 +23,7 @@ class Exercise:
     difficulty: str
     equipment: str
     instructions: str
+
 
 EXERCISES = [
     Exercise("Push-Up", "Chest", "Beginner", "No Equipment",
@@ -71,7 +74,6 @@ EXERCISES = [
              "Pull the cable handle toward your stomach."),
     Exercise("Bird Dog", "Back", "Beginner", "No Equipment",
              "Extend opposite arm and leg while keeping your torso stable."),
-
     Exercise("Barbell Bent-Over Row", "Back", "Intermediate", "Barbell",
              "Hinge forward and pull the barbell toward your waist."),
     Exercise("Single Arm Dumbbell Row", "Back", "Intermediate", "Dumbbells",
@@ -243,10 +245,14 @@ EXERCISES = [
 ]
 
 
+MUSCLE_GROUPS = ["Any", "Chest", "Back", "Shoulders", "Arms", "Legs", "Core"]
+EQUIPMENT_OPTIONS = [
+    "Any", "Dumbbells", "Barbell", "Machine", "Cables",
+    "Resistance Bands", "Medicine Ball", "No Equipment",
+    "Weighted Equipment"
+]
+DIFFICULTY_OPTIONS = ["Any", "Beginner", "Intermediate", "Advanced"]
 
-MUSCLE_GROUPS = ["Any", "Chest","Back","Shoulders","Arms","Legs","Core"]
-EQUIPMENT_OPTIONS = ["Any","Dumbbells","Barbell","Machine","Cables","Resistance Bands","Medicine Ball","No Equipment","Weighted Equipment"]
-DIFFICULTY_OPTIONS = ["Any","Beginner","Intermediate","Advanced"]
 
 @dataclass
 class State:
@@ -258,6 +264,7 @@ class State:
     exercises: list[Exercise]
     matching_exercises: list[Exercise]
     favorites: list[Exercise]
+
 
 def add_navigation(content: list) -> None:
     """Add navigation links to a page."""
@@ -272,26 +279,32 @@ def add_navigation(content: list) -> None:
         HorizontalRule()
     ])
 
-def find_exercise_by_name(exercises: list[Exercise], exercise_name: str) -> Exercise | None:
+
+def find_exercise_by_name(
+    exercises: list[Exercise],
+    exercise_name: str
+) -> Exercise | None:
     """Find an exercise using its name."""
     for exercise in exercises:
         if exercise.name == exercise_name:
             return exercise
     return None
 
+
 # Unit tests for find_exercise_by_name
-assert_equal(find_exercise_by_name(EXERCISES, "Push-Up"),EXERCISES[0])
-assert_equal(find_exercise_by_name(EXERCISES, "Barbell Bench Press"),EXERCISES[7])
-assert_equal(find_exercise_by_name(EXERCISES, "Cable Face Pull"),EXERCISES[26])
-assert_equal(find_exercise_by_name(EXERCISES, "Not An Exercise"),None)
-    
+assert_equal(find_exercise_by_name(EXERCISES, "Push-Up"), EXERCISES[0])
+assert_equal(find_exercise_by_name(EXERCISES, "Barbell Bench Press"), EXERCISES[7])
+assert_equal(find_exercise_by_name(EXERCISES, "Cable Face Pull"), EXERCISES[26])
+assert_equal(find_exercise_by_name(EXERCISES, "Not An Exercise"), None)
+
+
 def filter_exercises(
     exercises: list[Exercise],
     muscle: str,
     equipment: str,
     difficulty: str,
     search_name: str
-    ) -> list[Exercise]:
+) -> list[Exercise]:
     """Return exercises matching all selected filters."""
     matching = []
     for exercise in exercises:
@@ -299,55 +312,96 @@ def filter_exercises(
         equipment_matches = (equipment == "Any" or exercise.equipment == equipment)
         difficulty_matches = (difficulty == "Any" or exercise.difficulty == difficulty)
         name_matches = (search_name.strip().lower() in exercise.name.lower())
+
         if (muscle_matches and equipment_matches and difficulty_matches and name_matches):
             matching.append(exercise)
+
     return matching
+
 
 # Unit tests for filter_exercises
 assert_equal(filter_exercises(EXERCISES, "Any", "Any", "Any", ""), EXERCISES)
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", ""),EXERCISES[0:18])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Beginner", ""),EXERCISES[0:6])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Advanced", ""),EXERCISES[12:18])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Dumbbells", "Any", ""),[EXERCISES[1],EXERCISES[6],EXERCISES[10]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Barbell", "Advanced", ""), [EXERCISES[12], EXERCISES[14]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", "Push-Up"),[EXERCISES[0],EXERCISES[5],EXERCISES[16],EXERCISES[17]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", "PUSH-UP"),[EXERCISES[0],EXERCISES[5],EXERCISES[16],EXERCISES[17]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", "  Push-Up  "),[EXERCISES[0],EXERCISES[5],EXERCISES[16],EXERCISES[17]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Dumbbells", "Beginner", ""),[EXERCISES[1]])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Machine", "Advanced", ""),[])
-assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", "Swimming"),[])
+assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", ""), EXERCISES[0:18])
+assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Beginner", ""), EXERCISES[0:6])
+assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Advanced", ""), EXERCISES[12:18])
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Dumbbells", "Any", ""),
+    [EXERCISES[1], EXERCISES[6], EXERCISES[10]]
+)
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Barbell", "Advanced", ""),
+    [EXERCISES[12], EXERCISES[14]]
+)
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Any", "Any", "Push-Up"),
+    [EXERCISES[0], EXERCISES[5], EXERCISES[16], EXERCISES[17]]
+)
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Any", "Any", "PUSH-UP"),
+    [EXERCISES[0], EXERCISES[5], EXERCISES[16], EXERCISES[17]]
+)
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Any", "Any", "  Push-Up  "),
+    [EXERCISES[0], EXERCISES[5], EXERCISES[16], EXERCISES[17]]
+)
+assert_equal(
+    filter_exercises(EXERCISES, "Chest", "Dumbbells", "Beginner", ""),
+    [EXERCISES[1]]
+)
+assert_equal(filter_exercises(EXERCISES, "Chest", "Machine", "Advanced", ""), [])
+assert_equal(filter_exercises(EXERCISES, "Chest", "Any", "Any", "Swimming"), [])
 
-def add_exercise_to_favorites(favorite_list: list[Exercise],exercise: Exercise) -> None:
+
+def add_exercise_to_favorites(
+    favorite_list: list[Exercise],
+    exercise: Exercise
+) -> None:
     """Add an exercise without removing existing favorites."""
     already_saved = False
+
     for saved_exercise in favorite_list:
         if saved_exercise.name == exercise.name:
             already_saved = True
+
     if not already_saved:
         favorite_list.append(exercise)
 
-def remove_exercise_from_favorites(favorite_list: list[Exercise],exercise_name: str) -> list[Exercise]:
+
+def remove_exercise_from_favorites(
+    favorite_list: list[Exercise],
+    exercise_name: str
+) -> list[Exercise]:
     """Remove only the selected exercise from favorites."""
     remaining = []
+
     for exercise in favorite_list:
         if exercise.name != exercise_name:
             remaining.append(exercise)
+
     return remaining
 
+
 # Unit tests for remove_exercise_from_favorites
-assert_equal(remove_exercise_from_favorites
-             ([EXERCISES[0], EXERCISES[1], EXERCISES[2]],"Push-Up"),
-             [EXERCISES[1], EXERCISES[2]])
-assert_equal(remove_exercise_from_favorites
-             ([EXERCISES[0], EXERCISES[1]],"Not An Exercise"),
-             [EXERCISES[0], EXERCISES[1]])
-assert_equal(remove_exercise_from_favorites([EXERCISES[0]],"Push-Up"),[])
-assert_equal(remove_exercise_from_favorites([], "Push-Up"),[])
+assert_equal(
+    remove_exercise_from_favorites(
+        [EXERCISES[0], EXERCISES[1], EXERCISES[2]], "Push-Up"
+    ),
+    [EXERCISES[1], EXERCISES[2]]
+)
+assert_equal(
+    remove_exercise_from_favorites(
+        [EXERCISES[0], EXERCISES[1]], "Not An Exercise"
+    ),
+    [EXERCISES[0], EXERCISES[1]]
+)
+assert_equal(remove_exercise_from_favorites([EXERCISES[0]], "Push-Up"), [])
+assert_equal(remove_exercise_from_favorites([], "Push-Up"), [])
+
 
 @route
 def index(state: State) -> Page:
     """Display the FitFinder homepage."""
-    content = [Header("Welcome to FitFinder!")]
+    content: list = [Header("Welcome to FitFinder!")]
     add_navigation(content)
     content.extend([
         Header("Find Your Next Exercise"),
@@ -361,46 +415,40 @@ def index(state: State) -> Page:
         Button("View My Favorites", "favorites")
     ])
     return Page(state, content)
+
+
 # Unit test for index
-assert_equal(type(index(State
-    ("Any", "Any", "Any", "",EXERCISES.copy(), [], []))),Page)
+assert_equal(
+    type(index(State("Any", "Any", "Any", "", EXERCISES.copy(), [], []))),
+    Page
+)
+
 
 @route
 def find_exercises(state: State) -> Page:
     """Display the exercise search form."""
-    content = [Header("Find Exercises")]
+    content: list = [Header("Find Exercises")]
     add_navigation(content)
     content.extend([
         "Select a muscle group:",
-        SelectBox(
-            "selected_muscle",
-            MUSCLE_GROUPS,
-            state.selected_muscle
-        ),
+        SelectBox("selected_muscle", MUSCLE_GROUPS, state.selected_muscle),
         "Select your available equipment:",
-        SelectBox(
-            "selected_equipment",
-            EQUIPMENT_OPTIONS,
-            state.selected_equipment
-        ),
+        SelectBox("selected_equipment", EQUIPMENT_OPTIONS, state.selected_equipment),
         "Select your preferred difficulty:",
-        SelectBox(
-            "selected_difficulty",
-            DIFFICULTY_OPTIONS,
-            state.selected_difficulty
-        ),
+        SelectBox("selected_difficulty", DIFFICULTY_OPTIONS, state.selected_difficulty),
         "Search for a specific exercise (optional):",
-        TextBox(
-            "exercise_name",
-            state.selected_exercise_name
-        ),
+        TextBox("exercise_name", state.selected_exercise_name),
         HorizontalRule(),
         Button("Search Exercises", "exercise_results")
     ])
     return Page(state, content)
 
+
 # Unit test for find_exercises
-assert_equal(type(find_exercises(State("Any", "Any", "Any", "",EXERCISES.copy(), [], []))),Page)
+assert_equal(
+    type(find_exercises(State("Any", "Any", "Any", "", EXERCISES.copy(), [], []))),
+    Page
+)
 
 
 @route
@@ -416,6 +464,7 @@ def exercise_results(
     state.selected_equipment = selected_equipment
     state.selected_difficulty = selected_difficulty
     state.selected_exercise_name = exercise_name
+
     state.matching_exercises = filter_exercises(
         state.exercises,
         selected_muscle,
@@ -423,12 +472,14 @@ def exercise_results(
         selected_difficulty,
         exercise_name
     )
-    content = [Header("Exercise Results")]
+
+    content: list = [Header("Exercise Results")]
     add_navigation(content)
     content.append("Here are your matching exercises:")
+
     if len(state.matching_exercises) == 0:
         content.append(
-            "No exercises matched your search."
+            "No exercises matched your search. "
             "Try changing your selections."
         )
     else:
@@ -446,27 +497,28 @@ def exercise_results(
                 Button(
                     "View Exercise Details",
                     "exercise_details",
-                    [
-                        Argument("exercise_name", exercise.name)
-                    ]
+                    {"exercise_name": exercise.name}
                 ),
-                HorizontalRule()])
+                HorizontalRule()
+            ])
+
     content.append(Button("Search Again", "find_exercises"))
     return Page(state, content)
 
 
 @route
-def exercise_details(state: State,exercise_name: str) -> Page:
+def exercise_details(state: State, exercise_name: str) -> Page:
     """Display information about a selected exercise."""
-    exercise = find_exercise_by_name(state.exercises,exercise_name)
-    content = [Header("Exercise Details")]
+    exercise = find_exercise_by_name(state.exercises, exercise_name)
+
+    content: list = [Header("Exercise Details")]
     add_navigation(content)
+
     if exercise is None:
         content.extend([
             "Sorry, this exercise could not be found.",
             Button("Find Exercises", "find_exercises")
         ])
-
         return Page(state, content)
 
     content.extend([
@@ -485,46 +537,51 @@ def exercise_details(state: State,exercise_name: str) -> Page:
             Button(
                 "Remove from Favorites",
                 "remove_favorite",
-                [Argument("exercise_name", exercise.name)])])
-
+                {"exercise_name": exercise.name}
+            )
+        ])
     else:
         content.append(
             Button(
                 "Add to Favorites",
                 "add_favorite",
-                [Argument("exercise_name", exercise.name)]))
+                {"exercise_name": exercise.name}
+            )
+        )
 
     content.append(
         Button(
             "Back to Exercise Results",
             "exercise_results",
-            [
-                Argument("selected_muscle", state.selected_muscle),
-                Argument("selected_equipment", state.selected_equipment),
-                Argument("selected_difficulty", state.selected_difficulty),
-                Argument("exercise_name", state.selected_exercise_name)
-            ]))
+            {
+                "selected_muscle": state.selected_muscle,
+                "selected_equipment": state.selected_equipment,
+                "selected_difficulty": state.selected_difficulty,
+                "exercise_name": state.selected_exercise_name
+            }
+        )
+    )
 
     return Page(state, content)
 
+
 @route
-def add_favorite(state: State,exercise_name: str) -> Page:
+def add_favorite(state: State, exercise_name: str) -> Page:
     """Add an exercise to the user's favorites."""
-    exercise = find_exercise_by_name(state.exercises,exercise_name)
+    exercise = find_exercise_by_name(state.exercises, exercise_name)
+
     if exercise is not None:
-        add_exercise_to_favorites(
-            state.favorites,
-            exercise
-        )
+        add_exercise_to_favorites(state.favorites, exercise)
 
     return favorites(state)
+
 
 @route
 def favorites(state: State) -> Page:
     """Display all exercises saved by the user."""
-
-    content = [Header("My Favorite Exercises")]
+    content: list = [Header("My Favorite Exercises")]
     add_navigation(content)
+
     content.append(
         "You have saved "
         + str(len(state.favorites))
@@ -536,7 +593,6 @@ def favorites(state: State) -> Page:
             "You have not saved any favorite exercises yet.",
             Button("Find Exercises", "find_exercises")
         ])
-
     else:
         for exercise in state.favorites:
             content.extend([
@@ -547,49 +603,55 @@ def favorites(state: State) -> Page:
                 Button(
                     "View Exercise Details",
                     "exercise_details",
-                    [Argument("exercise_name", exercise.name)]
+                    {"exercise_name": exercise.name}
                 ),
                 Button(
                     "Remove Favorite",
                     "remove_favorite",
-                    [Argument("exercise_name", exercise.name)]
+                    {"exercise_name": exercise.name}
                 ),
                 HorizontalRule()
             ])
+
         content.append(
-            Button("Continue Finding Exercises", "find_exercises"))
+            Button("Continue Finding Exercises", "find_exercises")
+        )
+
     return Page(state, content)
 
-# Unit tests for favorites
 
+# Unit tests for favorites
 assert_equal(
     type(favorites(State(
         "Any", "Any", "Any", "",
         EXERCISES.copy(), [], []
     ))),
-    Page)
+    Page
+)
 assert_equal(
     type(favorites(State(
         "Any", "Any", "Any", "",
         EXERCISES.copy(), [],
         [EXERCISES[0], EXERCISES[1]]
     ))),
-    Page)
+    Page
+)
 
 
 @route
-def remove_favorite(state: State,exercise_name: str) -> Page:
+def remove_favorite(state: State, exercise_name: str) -> Page:
     """Remove one exercise without affecting other favorites."""
     state.favorites = remove_exercise_from_favorites(
         state.favorites,
-        exercise_name)
+        exercise_name
+    )
     return favorites(state)
 
 
 @route
 def about(state: State) -> Page:
     """Explain the purpose of FitFinder."""
-    content = [Header("About FitFinder")]
+    content: list = [Header("About FitFinder")]
     add_navigation(content)
     content.extend([
         Header("Our Purpose"),
@@ -609,23 +671,25 @@ def about(state: State) -> Page:
     ])
     return Page(state, content)
 
+
 # Unit test for about
 assert_equal(
     type(about(State(
         "Any", "Any", "Any", "",
         EXERCISES.copy(), [], []
     ))),
-    Page)
+    Page
+)
 
-#I realized I was using global variables to test these functions. 
-#So instead I made them into functions and tested them that way.
-#So all the functions up to that are missing unit tests after them they are now right here.
+
+# Unit tests for helper functions and routes
 def test_add_navigation():
     """Test that navigation links are added to a page."""
     navigation_content = ["Existing Content"]
 
     assert_equal(add_navigation(navigation_content), None)
-    assert_equal(navigation_content,
+    assert_equal(
+        navigation_content,
         [
             "Existing Content",
             Link("Home", "index"),
@@ -636,28 +700,37 @@ def test_add_navigation():
             " | ",
             Link("About", "about"),
             HorizontalRule()
-        ])
+        ]
+    )
 
 
 def test_add_exercise_to_favorites():
     """Test adding favorites and preventing duplicates."""
     favorite_test = [EXERCISES[1]]
 
-    assert_equal(add_exercise_to_favorites(favorite_test, EXERCISES[0]), None)
+    assert_equal(
+        add_exercise_to_favorites(favorite_test, EXERCISES[0]),
+        None
+    )
     assert_equal(favorite_test, [EXERCISES[1], EXERCISES[0]])
 
     add_exercise_to_favorites(favorite_test, EXERCISES[0])
     assert_equal(favorite_test, [EXERCISES[1], EXERCISES[0]])
 
     add_exercise_to_favorites(favorite_test, EXERCISES[2])
-    assert_equal(favorite_test, [EXERCISES[1], EXERCISES[0], EXERCISES[2]])
+    assert_equal(
+        favorite_test,
+        [EXERCISES[1], EXERCISES[0], EXERCISES[2]]
+    )
 
 
 def test_exercise_results():
     """Test that exercise results update the user's search selections."""
     test_state = State("Any", "Any", "Any", "", EXERCISES.copy(), [], [])
 
-    result_page = exercise_results(test_state, "Chest", "Dumbbells", "Beginner", "")
+    result_page = exercise_results(
+        test_state, "Chest", "Dumbbells", "Beginner", ""
+    )
 
     assert_equal(type(result_page), Page)
     assert_equal(test_state.selected_muscle, "Chest")
@@ -706,6 +779,7 @@ def test_remove_favorite():
     remove_favorite(test_state, "Not An Exercise")
     assert_equal(test_state.favorites, [EXERCISES[1], EXERCISES[2]])
 
+
 # Run the unit test functions
 test_add_navigation()
 test_add_exercise_to_favorites()
@@ -715,4 +789,5 @@ test_add_favorite()
 test_remove_favorite()
 
 
-start_server(State("Any","Any","Any","",EXERCISES.copy(),[],[]))
+start_server(State("Any", "Any", "Any", "", EXERCISES.copy(), [], []))
+
